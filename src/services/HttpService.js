@@ -63,17 +63,6 @@ class HttpService {
         return this.callfetch('/api/v2/people/authenticate', 'POST', headers, body);
     }
 
-    forgotPassword = (email) => {
-        let body = {
-            email:email,
-        }
-
-        let headers = {
-            'Content-type': 'application/json'
-        }
-        return this.callfetch('/api/v2/people/reset_password', 'GET', headers, body);
-    }
-
     getPasswordRequirements = () => {
         return this.callfetch('/api/v2/people/password_requirements', 'GET', null, null);
     }

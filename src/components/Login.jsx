@@ -6,11 +6,15 @@ class Login extends Component{
     constructor(props){
         super(props);
         this.state = {
-            email:"",
+            email: "",
             password: "",
             error:{
-                showError:false,
-                message:''
+                showError: false,
+                message: ''
+            },
+            success:{
+                showSuccess: false,
+                message: ''
             }
         };
         this.http = new HttpService();
@@ -69,10 +73,32 @@ class Login extends Component{
             });
             return;
         }
-        this.http.forgotPassword(this.state.email, this.state.password)
+        this.http.resetPassword(this.state.email)
             .then(res => res.json())
             .then(res => {
-                console.log(res);
+                if(res && res.error_code === 400){
+                    this.setState({
+                        error:{
+                            showError: true,
+                            message:res.message
+                        },
+                        success:{
+                            showSuccess: false,
+                            message: ''
+                        }
+                    });
+                } else {
+                    this.setState({
+                        error:{
+                            showError: false,
+                            message: ''
+                        },
+                        success:{
+                            showSuccess: true,
+                            message: res.message
+                        }
+                    });
+                }
             }, error => {
                 console.log(error);
             })
@@ -91,6 +117,12 @@ class Login extends Component{
                             this.state.error.showError ?
                                 <div className="alert alert-danger" role="alert">
                                     {this.state.error.message}
+                                </div> : null
+                        }
+                        {
+                            this.state.success.showSuccess ?
+                                <div className="alert alert-success" role="alert">
+                                    {this.state.success.message}
                                 </div> : null
                         }
                         <div className="form-group">
