@@ -24,22 +24,41 @@ class Login extends Component{
         this.onForgotPassword =this.onForgotPassword.bind(this);
     }
 
+    validate(){
+        let message = 'Please enter';
+        let isOk = true;
+
+        if(this.state.email === ''){
+            message += ' Email,';
+            isOk = false;
+        }
+        if(this.state.password === ''){
+            message += ' Password,';
+            isOk = false;
+        }
+
+        if(message[message.length-1] === ',')
+            message = message.slice(0, -1);
+
+        return { isOk: isOk, message: message} ;
+    }
+
     onLogin(e){
         e.preventDefault();
-        console.log(this.state);
+        let result = this.validate();
+
+        if(result && !result.isOk){
+            this.changeState('error', { showError: true,  message: result.message});
+            return;
+        }
+
         this.http.login(this.state.email, this.state.password)
             .then(res => res.json())
             .then(res => {
                 if(res && res.error_code === 400){
-                    console.log('error', res);
-                    this.setState({
-                        error:{
-                            showError: true,
-                            message:res.message
-                        }
-                    });
+                    this.changeState('error', { showError: true,  message: res.message});
+                    this.changeState('success', { showSuccess: false,  message: ''});
                 }else{
-                    console.log('success', res);
                     this.props.history.push("/account");
                 }
             }, error => {
@@ -51,53 +70,29 @@ class Login extends Component{
     }
 
     onEmailChange(e){
-        this.setState({
-            email: e.target.value
-        });
+        this.changeState('email', e.target.value);
     }
 
     onPasswordChange(e){
-        this.setState({
-            password: e.target.value
-        });
+        this.changeState('password', e.target.value);
     }
 
     onForgotPassword(e) {
         e.preventDefault();
         if(this.state.email === ''){
-            this.setState({
-                error:{
-                    showError: true,
-                    message:'Please enter email.'
-                }
-            });
+            this.changeState('error', { showError: true,  message: 'Please enter email.'});
+            this.changeState('success', { showSuccess: false,  message: ''});
             return;
         }
         this.http.resetPassword(this.state.email)
             .then(res => res.json())
             .then(res => {
                 if(res && res.error_code === 400){
-                    this.setState({
-                        error:{
-                            showError: true,
-                            message:res.message
-                        },
-                        success:{
-                            showSuccess: false,
-                            message: ''
-                        }
-                    });
+                    this.changeState('error', { showError: true,  message: res.message});
+                    this.changeState('success', { showSuccess: false,  message: ''});
                 } else {
-                    this.setState({
-                        error:{
-                            showError: false,
-                            message: ''
-                        },
-                        success:{
-                            showSuccess: true,
-                            message: res.message
-                        }
-                    });
+                    this.changeState('error', { showError: false,  message: ''});
+                    this.changeState('success', { showSuccess: true,  message: res.message});
                 }
             }, error => {
                 console.log(error);
@@ -105,6 +100,12 @@ class Login extends Component{
             .catch(e=>{
                 console.log(e);
             });
+    }
+
+    changeState(prop, value){
+        let options = {}
+        options[prop] = value;
+        this.setState(options);          
     }
 
     render(){

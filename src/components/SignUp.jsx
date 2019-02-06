@@ -2,9 +2,6 @@ import React, { Component } from 'react';
 import HttpService from '../services/HttpService';
 
 class SignUp extends Component{
-    baseUrl = "https://evening-plateau-93775.herokuapp.com"
-    loginUrl = "/api/v2/people/create";
-    passwordUrl = "/api/v2/people/password_requirements";
     constructor(){
         super();
         this.state = {
@@ -12,11 +9,12 @@ class SignUp extends Component{
             email:'',
             password: '',
             confirmPassword: '',
-            error:{
+            error: {
                 showError:false,
                 message:''
             }
         };
+        
         this.http = new HttpService();
         this.onSignUp = this.onSignUp.bind(this);
         this.onNameChange = this.onNameChange.bind(this);
@@ -29,74 +27,95 @@ class SignUp extends Component{
         this.http.getPasswordRequirements()
             .then(res => res.json())
             .then(res => {
-                console.log(res);
+                //Store the response
             }, error => {
-                console.log(error);
+                this.changeState('error', { showError: true,  message: 'Some thing went wrong, Please try again later!'});
             })
             .catch(e=>{
-                console.log(e);
+                this.changeState('error', { showError: true,  message: 'Some thing went wrong, Please try again later!'});
             });
       }
     
+    validate(){
+        let message = 'Please enter';
+        let isOk = true;
+
+        if(this.state.display_name === ''){
+            message += ' Name,';
+            isOk = false;
+        }
+        if(this.state.email === ''){
+            message += ' Email,';
+            isOk = false;
+        }
+        if(this.state.password === ''){
+            message += ' Password,';
+            isOk = false;
+        }
+        if(this.state.confirmPassword === ''){
+            message += ' Confirm Password,';
+            isOk = false;
+        }
+        
+        if(message[message.length-1] === ',')
+            message = message.slice(0, -1);
+
+        if(this.state.password !== this.state.confirmPassword){
+            message = 'Passwords do not match!'
+            isOk = false;
+        }
+        
+        return { isOk: isOk, message: message} ;
+        
+    }
+
     onSignUp(e){
         e.preventDefault();
-        console.log(this.state);
+
+        let result = this.validate();
+        
+        if(result && !result.isOk){
+            this.changeState('error', { showError: true,  message: result.message});
+            return;
+        }
+
         this.http.register(this.state.display_name, this.state.email, this.state.password)
             .then(res => res.json())
             .then(res => {
                 if(res && res.error_code === 400){
-                    console.log('error', res);
-                    this.setState({
-                        error:{
-                            showError: true,
-                            message:res.message
-                        }
-                    });
+                    this.changeState('error', { showError: true,  message: res.message});
                 }else{
-                    console.log('success', res);
                     localStorage.setItem('token', res.authentication_token);
                     this.props.history.push("/account");
                 }
             }, error => {
-                this.setState({
-                    error:{
-                        showError: true,
-                        message: 'Server is not responding. Please try again later'
-                    }
-                });
+                this.changeState('error', { showError: true,  message: 'Some thing went wrong, Please try again later!'});
             })
-            .catch(e=>{
-                this.setState({
-                    error:{
-                        showError: true,
-                        message: 'Server is not responding. Please try again later'
-                    }
-                });
+            .catch(e => {
+                this.changeState('error', { showError: true,  message: 'Some thing went wrong, Please try again later!'});
             });
     }
 
     onNameChange(e){
-        this.setState({
-            display_name: e.target.value
-        });
+        this.changeState('display_name', e.target.value);
     }
 
     onEmailChange(e){
-        this.setState({
-            email: e.target.value
-        });
+        this.changeState('email', e.target.value);
     }
 
     onPasswordChange(e){
-        this.setState({
-            password: e.target.value
-        });
+        this.changeState('password', e.target.value);
     }
     
     onConfirmPasswordChange(e){
-        this.setState({
-            confirmPassword: e.target.value
-        });
+        this.changeState('confirmPassword', e.target.value);
+    }
+
+    changeState(prop, value){
+        let options = {}
+        options[prop] = value;
+        this.setState(options);          
     }
 
     render(){
