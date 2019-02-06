@@ -78,7 +78,7 @@ class HttpService {
         return this.callfetch('/api/v2/people/password_requirements', 'GET', null, null);
     }
 
-    managePassword = (email) => {
+    resetPassword = (email) => {
         let body = {
             email:email
         }

@@ -21,3 +21,39 @@ code {
   width: 600px;
   margin: 5% auto;
 }
+
+.profile{
+  margin: 20px;
+  text-align: right;
+}
+
+.side-panel{
+  background-color: lightgray;
+  width: 0px;
+  height: 100%;
+  position: fixed;
+  top:0;
+  right:0;
+  z-index: 1;
+  transition: .5s;
+  text-align: left;
+}
+
+.side-panel>*{
+  padding-left: 20px;
+  padding-top: 20px;
+}
+
+.margin-right-250{
+  margin-right: 250px;
+  transition: margin-right .5s;
+}
+
+.slide{
+  width: 250px
+}
+
+.button{
+  margin: 10px;
+  text-align: center;
+}

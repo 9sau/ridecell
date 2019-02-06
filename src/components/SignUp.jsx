@@ -54,6 +54,7 @@ class SignUp extends Component{
                     });
                 }else{
                     console.log('success', res);
+                    localStorage.setItem('token', res.authentication_token);
                     this.props.history.push("/account");
                 }
             }, error => {
