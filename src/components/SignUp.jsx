@@ -25,7 +25,7 @@ class SignUp extends Component{
         this.onConfirmPasswordChange = this.onConfirmPasswordChange.bind(this);
     }
 
-    xcomponentDidMount() {
+    componentDidMount() {
         this.http.getPasswordRequirements()
             .then(res => res.json())
             .then(res => {
@@ -44,7 +44,18 @@ class SignUp extends Component{
         this.http.register(this.state.display_name, this.state.email, this.state.password)
             .then(res => res.json())
             .then(res => {
-                console.log(res);
+                if(res && res.error_code === 400){
+                    console.log('error', res);
+                    this.setState({
+                        error:{
+                            showError: true,
+                            message:res.message
+                        }
+                    });
+                }else{
+                    console.log('success', res);
+                    this.props.history.push("/account");
+                }
             }, error => {
                 this.setState({
                     error:{
@@ -86,19 +97,7 @@ class SignUp extends Component{
             confirmPassword: e.target.value
         });
     }
-   
-    callFetch(endPoint, options){
-        fetch(this.baseUrl+this.loginUrl, options)
-            .then(res => res.json())
-            .then(res => {
-                console.log(res);
-            }, error => {
-                console.log(error);
-            })
-            .catch(e=>{
-                console.log(e);
-            });
-    }
+
     render(){
         return(
             <div>

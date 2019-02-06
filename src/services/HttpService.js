@@ -43,7 +43,11 @@ class HttpService {
             password: password,
         };
 
-        return this.callfetch('/api/v2/people/create', 'POST', null, body);
+        let headers = {
+            'Content-type': 'application/json'
+        }
+
+        return this.callfetch('/api/v2/people/create', 'POST', headers, body);
     }
 
     authenticate = (email, password) => {
