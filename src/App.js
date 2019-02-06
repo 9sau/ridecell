@@ -4,7 +4,7 @@ import {BrowserRouter} from 'react-router-dom'
 
 import Login from './components/Login'
 import SignUp from './components/SignUp'
-import Account from './components/Login'
+import Account from './components/Account'
 import './App.css';
 
 class App extends Component {

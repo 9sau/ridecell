@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import HttpService from '../services/HttpService';
 
 class SignUp extends Component{
     baseUrl = "https://evening-plateau-93775.herokuapp.com"
@@ -10,9 +11,13 @@ class SignUp extends Component{
             display_name:'',
             email:'',
             password: '',
-            confirmPassword: ''
+            confirmPassword: '',
+            error:{
+                showError:false,
+                message:''
+            }
         };
-
+        this.http = new HttpService();
         this.onSignUp = this.onSignUp.bind(this);
         this.onNameChange = this.onNameChange.bind(this);
         this.onEmailChange = this.onEmailChange.bind(this);
@@ -20,8 +25,8 @@ class SignUp extends Component{
         this.onConfirmPasswordChange = this.onConfirmPasswordChange.bind(this);
     }
 
-    componentWillMount() {
-        fetch(this.baseUrl+this.passwordUrl)
+    xcomponentDidMount() {
+        this.http.getPasswordRequirements()
             .then(res => res.json())
             .then(res => {
                 console.log(res);
@@ -34,38 +39,28 @@ class SignUp extends Component{
       }
     
     onSignUp(e){
-        console.log(this.state);
-
-        if(this.state.password !== this.state.confirmPassword){
-            //TO DO error out
-            return
-        }
-
-        let obj = Object.create(this.state);
-
-        for(let key in obj){
-            if(obj[key] === ''){
-                //TO DO error out
-                return
-            }
-        }
-
-        let body = {
-            email:this.state.email,
-            password:this.state.password,
-            display_name:this.state.display_name
-        }
-
-        let options = {
-            method: 'POST',
-            headers:{
-                'Content-type': 'application/json'
-            },
-            body: JSON.stringify(body)
-        }
-
-        this.callFetch(this.loginUrl, options);
         e.preventDefault();
+        console.log(this.state);
+        this.http.register(this.state.display_name, this.state.email, this.state.password)
+            .then(res => res.json())
+            .then(res => {
+                console.log(res);
+            }, error => {
+                this.setState({
+                    error:{
+                        showError: true,
+                        message: 'Server is not responding. Please try again later'
+                    }
+                });
+            })
+            .catch(e=>{
+                this.setState({
+                    error:{
+                        showError: true,
+                        message: 'Server is not responding. Please try again later'
+                    }
+                });
+            });
     }
 
     onNameChange(e){
@@ -111,6 +106,12 @@ class SignUp extends Component{
                 <span>{this.state.errorMessage}</span>
                 <form>
                     <div className="form-wrapper">
+                        {
+                            this.state.error.showError ?
+                                <div className="alert alert-danger" role="alert">
+                                    {this.state.error.message}
+                                </div> : null
+                        }
                         <div className="form-group">
                             <input className="form-control" type="text" required name="displayName" placeholder="Display Name"
                                 required onChange={this.onNameChange}/>
