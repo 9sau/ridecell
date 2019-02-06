@@ -1,0 +1,27 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  background-color: purple;
+  color: white;
+}
+
+.login-form-wrapper {
+  background-color: green;
+  margin: auto;
+  width: 50%;
+  padding: 25px;
+}
+
+input {
+  height: 50px;
+  width: 100%;
+  margin: 2px 0px 2px 0;
+  display: inline-block
+}
+
+button {
+  height: 50px;
+  width: 100%;
+  margin: 2px 0 2px 0;
+}
