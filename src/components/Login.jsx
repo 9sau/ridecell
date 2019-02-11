@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import HttpService from '../services/HttpService';
+import config from '../config.js';
 
 class Login extends Component{
     
@@ -17,11 +18,13 @@ class Login extends Component{
                 message: ''
             }
         };
+        this.config = config.login;
         this.http = new HttpService();
         this.onLogin = this.onLogin.bind(this);
         this.onEmailChange = this.onEmailChange.bind(this);
         this.onPasswordChange = this.onPasswordChange.bind(this);
         this.onForgotPassword =this.onForgotPassword.bind(this);
+        
     }
 
     validate(){
@@ -59,7 +62,8 @@ class Login extends Component{
                     this.changeState('error', { showError: true,  message: res.message});
                     this.changeState('success', { showSuccess: false,  message: ''});
                 }else{
-                    this.props.history.push("/account");
+                    localStorage.setItem('token', res.authentication_token);
+                    this.props.history.push("/account", {data: res.person});
                 }
             }, error => {
                 console.log(error);
@@ -109,11 +113,18 @@ class Login extends Component{
     }
 
     render(){
+
+        var items = this.config.map((item, _id) => {
+            return (<div className="form-group" key={_id}>
+                <input className="form-control" type={item.type} name={ item.name } placeholder={item.placeholder}
+                    required={item.required} onChange={this[item.onChange]} value={item.value} onClick={this[item.onClick]} pattern={item.pattern}/>
+             </div>)
+        });
+
         return(
             <div className="center">
                 <h3 className="margin-top-10">Welcome! Please login to continue</h3>
-                <form>
-                    <div className="form-wrapper">
+                <form className="form-wrapper">
                         {
                             this.state.error.showError ?
                                 <div className="alert alert-danger" role="alert">
@@ -126,29 +137,13 @@ class Login extends Component{
                                     {this.state.success.message}
                                 </div> : null
                         }
-                        <div className="form-group">
-                            <input className="form-control" required type="text" name="email" placeholder="Email"  
-                                onChange={this.onEmailChange}
-                                pattern="[a-zA-Z0-9._]+@[a-zA-Z0-9]+\.[a-zA-Z0-9]{2,4}"
-                            />
-                        </div>
-                        <div className="form-group">
-                            <input className="form-control" required type="password" name="password"
-                                placeholder="Password" onChange={this.onPasswordChange}/>
-                        </div>
-                        <div className="form-group">
-                            <input className="form-control" required type="submit" value="Login"
-                                onClick={this.onLogin}/>
-                        </div>
+                        { items }
                         <div className="form-group">
                             <a href="/signup">Sign Up</a>
                         </div>
                         <div className="form-group">
-                            <button className="btn btn-primary"
-                                onClick={this.onForgotPassword}>Forgot Password
-                            </button>
+                            <button className="btn btn-primary" onClick={this.onForgotPassword}>Forgot Password</button>
                         </div>
-                    </div>
                 </form>
             </div>
         )

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import HttpService from '../services/HttpService';
+import config from '../config.js';
 
 class SignUp extends Component{
     constructor(){
@@ -15,6 +16,7 @@ class SignUp extends Component{
             }
         };
         
+        this.config = config.signup;
         this.http = new HttpService();
         this.onSignUp = this.onSignUp.bind(this);
         this.onNameChange = this.onNameChange.bind(this);
@@ -86,7 +88,7 @@ class SignUp extends Component{
                     this.changeState('error', { showError: true,  message: res.message});
                 }else{
                     localStorage.setItem('token', res.authentication_token);
-                    this.props.history.push("/account");
+                    this.props.history.push("/account", { data: res.person });
                 }
             }, error => {
                 this.changeState('error', { showError: true,  message: 'Some thing went wrong, Please try again later!'});
@@ -119,41 +121,29 @@ class SignUp extends Component{
     }
 
     render(){
+        var items = this.config.map((item, _id) => {
+            return (<div className="form-group" key={_id}>
+                <input className="form-control" type={item.type} name={ item.name } placeholder={item.placeholder}
+                    required={item.required} onChange={this[item.onChange]} value={item.value} onClick={this[item.onClick]} pattern={item.pattern}/>
+             </div>)
+        });
+        console.log(items);
         return(
             <div>
                 <h3 className="margin-top-10">Please tell us a little about you!</h3>
                 <span>{this.state.errorMessage}</span>
-                <form>
-                    <div className="form-wrapper">
-                        {
-                            this.state.error.showError ?
-                                <div className="alert alert-danger" role="alert">
-                                    {this.state.error.message}
-                                </div> : null
-                        }
-                        <div className="form-group">
-                            <input className="form-control" type="text" required name="displayName" placeholder="Display Name"
-                                required onChange={this.onNameChange}/>
-                        </div>
-                        <div className="form-group">
-                            <input className="form-control" type="text" required name="email" placeholder="Email" required
-                                onChange={this.onEmailChange}
-                                pattern="[a-zA-Z0-9._]+@[a-zA-Z0-9]+\.[a-zA-Z0-9]{2,4}"/>
-                        </div>
-                        <div className="form-group">
-                            <input className="form-control" type="password" required name="password" placeholder="Password" required
-                                onChange={this.onPasswordChange}/>
-                        </div>
-                        <div className="form-group">
-                            <input className="form-control" type="password" required name="confirmPassword"
-                                placeholder="Password Again" required onChange={this.onConfirmPasswordChange}/>
-                        </div>
-                        <div className="form-group">
-                            <input className="form-control" type="submit" required value="Sign Up" onClick={this.onSignUp}/>
-                        </div>
-                        <div className="form-group">
-                            <a href="/login">Login</a>
-                        </div>
+                <form className="form-wrapper">
+                    {
+                        this.state.error.showError ?
+                            <div className="alert alert-danger" role="alert">
+                                {this.state.error.message}
+                            </div> : null
+                    }
+                    {
+                        items
+                    }
+                    <div className="form-group">
+                        <a href="/">Login</a>
                     </div>
                 </form>
             </div>

@@ -45,12 +45,12 @@ code {
 }
 
 .margin-right-250{
-  margin-right: 250px;
+  margin-right: 300px;
   transition: margin-right .5s;
 }
 
 .slide{
-  width: 250px
+  width: 300px
 }
 
 .button{

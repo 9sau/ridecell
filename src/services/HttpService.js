@@ -11,29 +11,21 @@ class HttpService {
         return this.callfetch('/api/v2/people/authenticate', 'POST', headers, body);
     }
 
-    getUserByKey = (email, key) => {
-        let body = {
-            email:email,
-        }
-
+    getUserByKey = (key) => {
         let headers = {
-            'Authorization': ''
+            'Authorization': localStorage.getItem('token')
         }
 
-        let url = '/api/v2/people/reset_password/' + key;
-        return this.callfetch(url, 'GET', headers, body);
+        let url = '/api/v2/people/' + key;
+        return this.callfetch(url, 'GET', headers, null);
     }
 
-    getUser = (email) => {
-        let body = {
-            email:email,
-        };
-
+    getUser = () => {
         let headers = {
-            'Authorization': ''
+            'Authorization': localStorage.getItem('token')
         };
 
-        return this.callfetch('/api/v2/people/reset_password', 'GET', headers, body);
+        return this.callfetch('/api/v2/people', 'GET', headers, null);
     }
 
     register = (display_name, email, password) => {
