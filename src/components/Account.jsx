@@ -40,7 +40,7 @@ class Account extends Component{
                 this.changeState('success', { showSuccess: false,  message: '' });
             }else{
                 this.changeState('error', { showError: false,  message: '' });
-                this.changeState('success', { showSuccess: true,  message: res });
+                this.changeState('account', res);
                 
             }
         }, error => {
